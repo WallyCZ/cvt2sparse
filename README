@@ -1,0 +1,11 @@
+Convert to sparse file utility
+
+The utility is intended for converting files into sparse ones on Windows NTFS file system.
+Sparse files are those in which long zero blocks are not stored on hard disk, but replaced
+to information about them (metadata) instead.
+These files are very useful for saving space on storing half-empty ISO files,
+half-downloaded torrent files, virtual machine disk images.
+
+More about them: https://en.wikipedia.org/wiki/Sparse_file
+
+-- dennis(a)yurichev.com

@@ -1,0 +1,8 @@
+Prerequisites: 
+
+* Octothorpe library: https://github.com/dennis714/octothorpe
+* Porg library: https://github.com/dennis714/porg
+* MinGW.
+
+You may need fix makefile (OCTOTHORPE and PORG variables is to be changed to path where 
+corresponding libraries are).
