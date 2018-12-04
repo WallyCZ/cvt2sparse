@@ -9,7 +9,7 @@
 #include "porg_utils.h"
 #include "files.h"*/
 
-bool verbose=false, dry_run=false;
+BOOL verbose=FALSE, dry_run= FALSE;
 
 void die_GetLastError(char *fname)
 {
@@ -49,7 +49,7 @@ void convert_file_to_sparse (char *fname)
 		die_GetLastError ("GetFileSizeEx()");
 
 	printf ("%s...\n", fname);
-	if (dry_run==false)
+	if (dry_run == FALSE)
 	{
 		DWORD dwTemp;
 		b=DeviceIoControl(f, FSCTL_SET_SPARSE, NULL, 0, NULL, 0, &dwTemp, NULL);
@@ -71,13 +71,13 @@ void convert_file_to_sparse (char *fname)
 
 	for (;;)
 	{
-		DWORD was_read;
+		DWORD was_read = 0;
 
 		b=ReadFile (f, buf, BLK_SIZE, &was_read, NULL);
 		if (b==FALSE || was_read!=BLK_SIZE)
 			break;
 
-		bool is_zero_buf=is_blk_zero (buf, BLK_SIZE);
+		BOOL is_zero_buf = is_blk_zero (buf, was_read);
 
 		if (state==0 && is_zero_buf)
 		{
@@ -87,7 +87,7 @@ void convert_file_to_sparse (char *fname)
 		else if (state==1 && is_zero_buf==false)
 		{
 			// got zero block
-			SIZE_T sz=cur_pos-zero_blk_begin;
+			LONGLONG sz = cur_pos - zero_blk_begin;
 			if (verbose)
 			{
 				printf (" end=0x%I64x, size=%" PRId64 "\n", cur_pos, sz);
@@ -96,10 +96,12 @@ void convert_file_to_sparse (char *fname)
 				strbuf_puts(&sb);
 				strbuf_deinit(&sb);*/
 			};
-			if (dry_run==false)
+
+			if (dry_run == FALSE)
 				set_sparse_range (fname, f, zero_blk_begin, sz);
-			state=0;
-			zero_bufs_size+=sz;
+
+			state = 0;
+			zero_bufs_size += sz;
 		};
 
 		cur_pos+=BLK_SIZE;
@@ -160,12 +162,12 @@ int main(int argc, char* argv[])
 		if (stricmp (argv[arg], "--verbose")==0)
 		{
 			printf ("Setting verbose\n");
-			verbose=true;
+			verbose = TRUE;
 		}
 		else if (stricmp (argv[arg], "--dry-run")==0)
 		{
 			printf ("Setting dry run\n");
-			dry_run=true;
+			dry_run = TRUE;
 		}
 		else
 			convert_file_or_dir_to_sparse (argv[arg]);
