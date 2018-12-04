@@ -1,8 +1,9 @@
 Prerequisites: 
 
-* Octothorpe library: https://github.com/dennis714/octothorpe
-* Porg library: https://github.com/dennis714/porg
-* MinGW.
+* CMake >= 3.9.1
+* Visual Studio or some other Windows C compiler
 
-You may need fix makefile (OCTOTHORPE and PORG variables is to be changed to path where 
-corresponding libraries are).
+Generate project files with CMake:
+
+VS2015: cmake -G "Visual Studio 14 2015" .
+

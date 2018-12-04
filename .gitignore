@@ -1,0 +1,13 @@
+CMakeFiles
+/bin
+/cvt2sparse.dir
+/Win32
+*.VC.db
+*.cmake
+CMakeCache\.txt
+
+*.filters
+
+*.vcxproj
+
+*.sln
