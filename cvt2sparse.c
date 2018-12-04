@@ -73,18 +73,20 @@ void convert_file_to_sparse (char *fname)
 	{
 		DWORD was_read = 0;
 
-		b=ReadFile (f, buf, BLK_SIZE, &was_read, NULL);
-		if (b==FALSE || was_read!=BLK_SIZE)
-			break;
+		b = ReadFile (f, buf, BLK_SIZE, &was_read, NULL);
 
 		BOOL is_zero_buf = is_blk_zero (buf, was_read);
 
-		if (state==0 && is_zero_buf)
+		if (state == 0 && was_read > 0 && is_zero_buf)
 		{
 			zero_blk_begin=cur_pos;
+			if (verbose)
+			{
+				printf("zero block. begin=0x%" PRIx64, zero_blk_begin);
+			}
 			state=1;
 		}
-		else if (state==1 && is_zero_buf==false)
+		else if (state == 1 && is_zero_buf == FALSE)
 		{
 			// got zero block
 			LONGLONG sz = cur_pos - zero_blk_begin;
@@ -104,7 +106,13 @@ void convert_file_to_sparse (char *fname)
 			zero_bufs_size += sz;
 		};
 
-		cur_pos+=BLK_SIZE;
+		if (b == FALSE || was_read == 0)
+		{
+			break;
+		}
+
+
+		cur_pos += was_read;
 	};
 
 	free (buf);
@@ -140,7 +148,7 @@ void convert_file_or_dir_to_sparse (char *fname)
 	} while (FindNextFile (h, &d)!=FALSE);
 };
 
-int main(int argc, char* argv[])
+int main()
 {
 	int argc = 0;
 	PCHAR *argv = CommandLineToArgvA( GetCommandLineA(), &argc );
