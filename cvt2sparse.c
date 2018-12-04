@@ -1,13 +1,21 @@
 #include <windows.h>
 #include <stdio.h>
+#include <inttypes.h>
+#include "utils.h"
 
-#include "bitfields.h"
+/*#include "bitfields.h"
 #include "oassert.h"
 #include "memutils.h"
 #include "porg_utils.h"
-#include "files.h"
+#include "files.h"*/
 
 bool verbose=false, dry_run=false;
+
+void die_GetLastError(char *fname)
+{
+	DWORD err = GetLastError();
+	exit(-1);
+}
 
 void set_sparse_range(char *fname, HANDLE h, LONGLONG start, LONGLONG size)
 {
@@ -54,7 +62,7 @@ void convert_file_to_sparse (char *fname)
 
 #define BLK_SIZE 0x100000
 	BYTE* buf=(BYTE*)malloc(BLK_SIZE);
-	oassert(buf);
+	//oassert(buf);
 
 	int state=0; // 0 - initial, 1 - first zero block was seen
 	LONGLONG zero_blk_begin=0;
@@ -82,11 +90,11 @@ void convert_file_to_sparse (char *fname)
 			SIZE_T sz=cur_pos-zero_blk_begin;
 			if (verbose)
 			{
-				printf ("zero block. begin=0x%I64x, end=0x%I64x, size=", zero_blk_begin, cur_pos);
-				strbuf sb=STRBUF_INIT;
+				printf (" end=0x%I64x, size=%" PRId64 "\n", cur_pos, sz);
+				/*strbuf sb=STRBUF_INIT;
 				strbuf_fancy_size (&sb, sz);
 				strbuf_puts(&sb);
-				strbuf_deinit(&sb);
+				strbuf_deinit(&sb);*/
 			};
 			if (dry_run==false)
 				set_sparse_range (fname, f, zero_blk_begin, sz);
@@ -100,11 +108,11 @@ void convert_file_to_sparse (char *fname)
 	free (buf);
 	CloseHandle (f);
 
-	printf ("Total size of zero blocks marked=");
-	strbuf sb=STRBUF_INIT;
+	printf ("Total size of zero blocks marked=%" PRId64 "\n", zero_bufs_size);
+	/*strbuf sb=STRBUF_INIT;
 	strbuf_fancy_size (&sb, zero_bufs_size);
 	strbuf_puts(&sb);
-	strbuf_deinit(&sb);
+	strbuf_deinit(&sb);*/
 	printf ("Now the file occupies %02f%% of its size.\n", 
 			100-(double)(((double)zero_bufs_size/(double)file_size.QuadPart)*100));
 };
@@ -121,17 +129,21 @@ void convert_file_or_dir_to_sparse (char *fname)
 		if (IS_SET(d.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 			continue;
 
-		strbuf sb=STRBUF_INIT;
+		/*strbuf sb=STRBUF_INIT;
 		full_path_and_filename_to_path_only (&sb, fname);
 		strbuf_addstr (&sb, d.cFileName);
 		convert_file_to_sparse (sb.buf);
-		strbuf_deinit (&sb);
+		strbuf_deinit (&sb);*/
+		convert_file_to_sparse(d.cFileName);
 	} while (FindNextFile (h, &d)!=FALSE);
 };
 
 int main(int argc, char* argv[])
 {
-	printf ("Convert to NTFS sparse file <dennis(a)yurichev.com> (%s)\n\n", __DATE__);
+	int argc = 0;
+	PCHAR *argv = CommandLineToArgvA( GetCommandLineA(), &argc );
+	printf ("Convert to NTFS sparse file <dennis(a)yurichev.com>, <vaclav.lipert(a)live.com> (%s)\n\n", __DATE__);
+
 	if (argc==1)
 	{
 		printf ("Usage: cvt2parse [--verbose] [--dry-run] file_or_directory ...\n");
@@ -144,7 +156,7 @@ int main(int argc, char* argv[])
 
 	for (int arg=1; arg<argc; arg++)
 	{
-		oassert (argv[arg]);
+		//oassert (argv[arg]);
 		if (stricmp (argv[arg], "--verbose")==0)
 		{
 			printf ("Setting verbose\n");
